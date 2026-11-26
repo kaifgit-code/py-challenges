@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loops in Python - for loop visualizer</title>
+<style>
+*{box-sizing:border-box}
+:root{--paper:#f1f4f6;--ink:#14213d;--muted:#52607a;--card:#fff;--hl:#ffd23f;--teal:#17806d;--red:#d6403a;--code:#0f1a2e;--codetx:#e8edf7}
+body{margin:0;color:var(--ink);font:17px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background-color:var(--paper);background-image:linear-gradient(rgba(20,33,61,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(20,33,61,.07) 1px,transparent 1px);background-size:26px 26px}
+.wrap{max-width:900px;margin:0 auto;padding:34px 18px 60px}
+h1,h2{font-family:Rockwell,"Roboto Slab","Courier New",Georgia,serif;line-height:1.2;font-weight:700}
+h1{font-size:clamp(28px,5.5vw,44px);margin:0 0 12px}
+h2{font-size:26px;margin:48px 0 8px}
+p{margin:0 0 12px;max-width:66ch}
+.lead{font-size:19px}
+.note{font-family:"Segoe Print","Bradley Hand","Chalkboard SE",cursive;background:var(--hl);padding:10px 14px;display:inline-block;transform:rotate(-1.2deg);font-size:15px;box-shadow:2px 3px 0 rgba(20,33,61,.2);max-width:46ch}
+.card{background:var(--card);border:2px solid var(--ink);padding:18px;box-shadow:5px 5px 0 var(--ink)}
+button{font:inherit;cursor:pointer;color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn{border:2px solid var(--ink);background:#fff;padding:8px 18px;font-weight:600;border-radius:4px}
+.btn.main{background:var(--teal);color:#fff}
+.btn:active{transform:translateY(2px)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.facts .card{box-shadow:4px 4px 0 var(--hl)}
+.facts b{font-family:Rockwell,"Roboto Slab",Georgia,serif}
+code{background:#e3e9ef;padding:1px 6px;font:15px ui-monospace,Consolas,monospace}
+.inputs{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-bottom:8px}
+.inputs label{font-weight:600;font-size:15px;display:block}
+.inputs input[type=text]{width:84px;border:2px solid var(--ink);padding:6px 8px;font:17px ui-monospace,Consolas,monospace;background:#fff}
+.presets{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;font-size:15px;align-items:center}
+.pre{border:2px solid var(--ink);background:#fff;padding:2px 12px;border-radius:20px;font:14px ui-monospace,Consolas,monospace}
+.err{color:var(--red);font-weight:600;min-height:24px}
+.track{position:relative;overflow-x:auto;padding:30px 6px 10px;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);background:#f7f9fb;margin-bottom:6px}
+.circles{display:flex;gap:12px;width:max-content;min-width:100%;align-items:center}
+.c{width:46px;height:46px;border-radius:50%;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font:700 16px ui-monospace,Consolas,monospace;background:#fff;flex:none;transition:background .25s,transform .25s}
+.c.done{background:#bfe8d8}
+.c.cur{background:var(--hl);transform:scale(1.2)}
+.c.ghost{border-style:dashed;color:var(--muted);background:transparent}
+#ptr{position:absolute;top:6px;left:0;width:0;height:0;border:9px solid transparent;border-top:14px solid var(--red);border-bottom:0;transition:left .35s;opacity:0}
+.hint{font-size:14px;color:var(--muted);margin-bottom:14px}
+.counter{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.counter div{border:2px solid var(--ink);padding:4px 14px;font:15px ui-monospace,Consolas,monospace;background:#fffbe6}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:14px}
+@media(max-width:680px){.grid2{grid-template-columns:1fr}}
+.label{font-weight:700;font-size:15px;margin:0 0 4px}
+.code{background:var(--code);color:var(--codetx);padding:10px 0;font:15px/1.8 ui-monospace,Consolas,Menlo,monospace;min-height:110px}
+.ln{display:flex;padding:0 12px;border-left:5px solid transparent}
+.ln.on{background:#2b3b5c;border-left-color:var(--hl)}
+.no{width:26px;color:#7f8fb0;user-select:none;flex:none}
+.ln span:last-child{white-space:pre;overflow-x:auto}
+.console{background:#0a0f1a;color:#8ff0b5;padding:10px 14px;min-height:110px;max-height:190px;overflow-y:auto;font:15px/1.6 ui-monospace,Consolas,monospace}
+.console:empty:before{content:"(nothing printed yet)";color:#5b6a86}
+.msg{margin:12px 0;padding:10px 14px;border-left:6px solid var(--teal);background:#e7f4f1;min-height:48px}
+.ctrl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.ctrl label{margin-left:auto;font-size:15px;display:flex;gap:8px;align-items:center}
+.q{margin-bottom:18px}
+.q b{display:block;margin-bottom:8px}
+.opt{border:2px solid var(--ink);background:#fff;padding:6px 16px;margin:0 8px 8px 0;font-weight:600}
+.opt.right{background:#bfe8d8}.opt.wrong{background:#f6c6c2}
+.why{margin-top:4px;font-size:16px}
+pre.static{background:var(--code);color:var(--codetx);padding:12px 16px;font:15px/1.7 ui-monospace,Consolas,monospace;margin:10px 0;overflow-x:auto}
+footer{margin-top:50px;font-size:14px;color:var(--muted)}
+@media(prefers-reduced-motion:reduce){.c,#ptr{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>A loop is a way to say "do this again" without writing it again</h1>
+  <p class="lead">Imagine printing the numbers 1 to 100. You could write <code>print()</code> a hundred times, or you could write it once inside a loop and let Python repeat it.</p>
+  <p class="note">Change the numbers below and watch what the loop does.</p>
+
+  <div class="facts">
+    <div class="card"><b>for</b> repeats once for every item it is given. <code>range()</code> is the usual way to give it numbers.</div>
+    <div class="card"><b>range(start, stop, step)</b> begins at start, jumps by step, and stops <i>before</i> it reaches stop.</div>
+    <div class="card"><b>Iteration</b> is just the word for one trip around the loop. Three numbers means three iterations.</div>
+  </div>
+</header>
+
+<section>
+  <h2>Try the for loop</h2>
+  <div class="card">
+    <div class="inputs">
+      <div><label for="start">start</label><input type="text" id="start" value="1" inputmode="numeric"></div>
+      <div><label for="stop">stop</label><input type="text" id="stop" value="6" inputmode="numeric"></div>
+      <div><label for="step">step</label><input type="text" id="step" value="1" inputmode="numeric"></div>
+    </div>
+    <div class="presets">Quick tries:
+      <button class="pre" data-v="1,6,1">1, 6, 1</button>
+      <button class="pre" data-v="2,8,1">2, 8, 1</button>
+      <button class="pre" data-v="0,20,5">0, 20, 5</button>
+      <button class="pre" data-v="10,0,-2">10, 0, -2</button>
+      <button class="pre" data-v="5,5,1">5, 5, 1</button>
+    </div>
+    <div class="err" id="err" role="alert"></div>
+
+    <div class="track" id="track">
+      <div id="ptr"></div>
+      <div class="circles" id="circles"></div>
+    </div>
+    <div class="hint">Dashed circle = the stop value. Python looks at it but never uses it.</div>
+
+    <div class="counter">
+      <div id="iter">Iteration 0 of 0</div>
+      <div id="ival">i is not set yet</div>
+    </div>
+
+    <div class="grid2">
+      <div><p class="label">The program</p><div class="code" id="code"></div></div>
+      <div><p class="label">Screen</p><div class="console" id="console" aria-live="polite"></div></div>
+    </div>
+
+    <div class="msg" id="msg">Press Next to run the first line.</div>
+
+    <div class="ctrl">
+      <button class="btn main" id="next">Next</button>
+      <button class="btn" id="play">Play</button>
+      <button class="btn" id="reset">Reset</button>
+      <label>Slow <input type="range" id="speed" min="1" max="10" value="5" aria-label="Speed"> Fast</label>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>The other kind: while</h2>
+  <p>A <code>while</code> loop keeps going as long as its condition is true. You move the counter yourself, so it is easy to forget.</p>
+  <pre class="static">i = 1
+while i &lt; 5:
+    print(i)
+    i += 1      # forget this line and the loop never ends</pre>
+  <p>This prints 1, 2, 3, 4, exactly like <code>range(1, 5)</code>.</p>
+</section>
+
+<section>
+  <h2>Check yourself</h2>
+  <div class="card" id="quiz"></div>
+</section>
+
+<footer>Made for the Python Concept-to-Experience Challenge, topic 9.</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const E=n=>document.createElement(n);
+let vals=[],steps=[],code=[],pos=-1,playing=false,tm=null,ok=false;
+const delay=()=>1900-$('#speed').value*170;
+
+function build(){
+  pause();pos=-1;
+  const r=['start','stop','step'].map(id=>$('#'+id).value.trim());
+  $('#console').innerHTML='';vals=[];steps=[];
+  const fail=t=>{$('#err').textContent=t;ok=false;$('#circles').innerHTML='';$('#ptr').style.opacity=0;$('#code').innerHTML='';$('#next').disabled=$('#play').disabled=true;$('#iter').textContent='Iteration 0 of 0';$('#ival').textContent='i is not set yet';$('#msg').textContent='Fix the numbers above to continue.'};
+  if(!r.every(x=>/^-?\d{1,3}$/.test(x)))return fail('Please type whole numbers only, up to 3 digits.');
+  const [s,e,st]=r.map(Number);
+  if(st===0)return fail('step cannot be 0. Python would stop with: ValueError: range() arg 3 must not be zero');
+  for(let v=s;st>0?v<e:v>e;v+=st){vals.push(v);if(vals.length>30)return fail('That makes more than 30 numbers. Try a smaller range.')}
+  ok=true;$('#err').textContent='';$('#next').disabled=$('#play').disabled=false;
+
+  code=[`for i in range(${s}, ${e}, ${st}):`,'    print(i)','print("Done!")'];
+  const sign=st>0?'+':'-',amt=Math.abs(st);
+  vals.forEach((v,k)=>{
+    steps.push({line:0,c:k,it:k+1,i:v,msg:k?`Back to the top. ${vals[k-1]} ${sign} ${amt} is ${v}, so i becomes ${v}.`:`The loop starts at ${s}, so i becomes ${s}.`});
+    steps.push({line:1,c:k,it:k+1,i:v,out:String(v),msg:`The indented line is inside the loop. It prints i, which is ${v}.`});
+  });
+  const last=vals.length?vals[vals.length-1]:null;
+  steps.push({line:0,c:-1,it:vals.length,i:last,msg:vals.length?`The next number would be ${last+st}, which goes past the stop value ${e}. range() is empty now, so the loop ends.`:`range(${s}, ${e}, ${st}) gives no numbers at all (${st>0?'start is not below stop':'start is not above stop'}). The loop body never runs.`});
+  steps.push({line:2,c:-1,it:vals.length,i:last,out:'Done!',msg:'This line is not indented, so it is outside the loop. It runs once, after the loop is over.'});
+
+  const cs=$('#circles');cs.innerHTML='';
+  vals.forEach(v=>{const d=E('div');d.className='c';d.textContent=v;cs.appendChild(d)});
+  const g=E('div');g.className='c ghost';g.textContent=e;g.title='stop value (not included)';cs.appendChild(g);
+  const c=$('#code');c.innerHTML='';
+  code.forEach((t,i)=>{const d=E('div');d.className='ln';const n=E('span');n.className='no';n.textContent=i+1;const x=E('span');x.textContent=t;d.append(n,x);c.appendChild(d)});
+  show(null);
+  $('#msg').textContent=vals.length?'Press Next to run the first line.':'This range is empty. Press Next to see what Python does.';
+}
+
+function show(s){
+  [...$('#code').children].forEach((d,i)=>d.classList.toggle('on',!!s&&i===s.line));
+  const cs=[...$('#circles').children];
+  cs.forEach((d,i)=>{d.classList.remove('cur','done');
+    if(!s||i>=vals.length)return;
+    if(s.c===-1||i<s.c)d.classList.add('done');else if(i===s.c)d.classList.add('cur')});
+  const p=$('#ptr');
+  if(s&&s.c>=0){const t=cs[s.c];p.style.opacity=1;p.style.left=(t.offsetLeft+t.offsetWidth/2-9)+'px';
+    const tr=$('#track');tr.scrollTo({left:t.offsetLeft-tr.clientWidth/2+23,behavior:'smooth'})}
+  else p.style.opacity=0;
+  $('#iter').textContent='Iteration '+(s?s.it:0)+' of '+vals.length;
+  $('#ival').textContent=s&&s.i!==null?'i = '+s.i:'i is not set yet';
+}
+function go(){
+  if(!ok||pos>=steps.length-1)return false;
+  const s=steps[++pos];show(s);$('#msg').textContent=s.msg;
+  if(s.out!=null){const d=E('div');d.textContent=s.out;const c=$('#console');c.appendChild(d);c.scrollTop=c.scrollHeight}
+  return true;
+}
+function pause(){playing=false;clearTimeout(tm);$('#play').textContent='Play'}
+function play(){
+  if(playing){pause();return}
+  if(pos>=steps.length-1)build();
+  if(!ok)return;
+  playing=true;$('#play').textContent='Pause';
+  const tick=()=>{go();if(pos>=steps.length-1){pause();return}tm=setTimeout(tick,delay())};
+  tick();
+}
+$('#next').onclick=()=>{pause();go()};
+$('#play').onclick=play;
+$('#reset').onclick=build;
+['start','stop','step'].forEach(id=>$('#'+id).addEventListener('input',build));
+document.querySelectorAll('.pre').forEach(b=>b.onclick=()=>{const v=b.dataset.v.split(',');$('#start').value=v[0];$('#stop').value=v[1];$('#step').value=v[2];build()});
+build();
+
+/* ---------- quiz ---------- */
+const Q=[
+ {q:'How many times does for i in range(2, 8) run?',o:['5','6','7','8'],a:1,w:'It gives 2, 3, 4, 5, 6, 7. The stop value 8 is not included, so that is 6 numbers.'},
+ {q:'What does range(1, 5) give?',o:['1, 2, 3, 4, 5','1, 2, 3, 4','0, 1, 2, 3, 4'],a:1,w:'It starts at 1 and stops before 5.'},
+ {q:'What does range(10, 0, -3) give?',o:['10, 7, 4, 1','10, 7, 4, 1, 0','9, 6, 3'],a:0,w:'A negative step counts down: 10, 7, 4, 1. The next one would be -2, which is past 0.'}
+];
+Q.forEach(q=>{
+  const box=E('div');box.className='q';box.innerHTML='<b>'+q.q+'</b>';
+  const why=E('div');why.className='why';
+  q.o.forEach((t,i)=>{const b=E('button');b.className='opt';b.textContent=t;
+    b.onclick=()=>{[...box.querySelectorAll('.opt')].forEach(x=>x.classList.remove('right','wrong'));
+      b.classList.add(i===q.a?'right':'wrong');why.textContent=i===q.a?'Correct. '+q.w:'Not quite, try again. Tip: put the numbers into the simulator above.'};
+    box.appendChild(b)});
+  box.appendChild(why);$('#quiz').appendChild(box);
+});
+</script>
+</body>
+</html>
